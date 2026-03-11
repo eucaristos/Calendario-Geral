@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calendário Eucaristos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.19/index.global.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: inherit;
+      background: #121212;
+      color: #fff;
+      padding: 1rem;
+    }
+
+    #legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85em;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    #filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #ccc;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85em;
+      transition: all 0.2s;
+    }
+    .filter-btn.active {
+      background: #e65c00;
+      border-color: #e65c00;
+      color: white;
+    }
+
+    /* FullCalendar overrides */
+    .fc { font-size: 14px; }
+    .fc-toolbar-title { font-size: 1.2em !important; font-weight: bold; }
+    .fc-scrollgrid, .fc-scrollgrid td, .fc-scrollgrid th { border-color: #333 !important; }
+    .fc-daygrid-day { min-height: 80px; }
+    .fc-daygrid-day.fc-day-today { background: rgba(255,220,100,0.1) !important; }
+    .fc-col-header-cell { background: #1a1a1a; padding: 6px; }
+    .fc-daygrid-event-dot { display: none !important; }
+    .fc-list-event-dot { display: none !important; }
+
+    .fc-event {
+      border-radius: 4px !important;
+      padding: 2px 6px !important;
+      font-weight: 600 !important;
+      font-size: 0.85em !important;
+      min-height: 22px;
+      cursor: pointer;
+    }
+    .fc-event * { color: #fff !important; }
+    .fc-event-title { color: #fff !important; }
+
+    .fc-list-event td { padding: 8px 12px !important; }
+    .fc-list-event-title a { font-weight: 600 !important; text-decoration: none !important; }
+    .fc-list-day-cushion { background: #1a1a1a !important; }
+    .fc-list-day-text, .fc-list-day-side-text { color: #e65c00 !important; font-weight: 700 !important; }
+    .fc-list-empty { color: #888 !important; background: transparent !important; }
+
+    .fc-button, .fc-button-primary {
+      background: #e65c00 !important;
+      border: none !important;
+      border-color: #e65c00 !important;
+      color: white !important;
+      border-radius: 4px !important;
+      box-shadow: none !important;
+      font-size: 0.85em !important;
+    }
+    .fc-button:hover { background: #cc5200 !important; }
+    .fc-button-active { background: #aa4400 !important; }
+
+    /* Modal */
+    #fc-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #fc-modal.active { display: flex; }
+    #fc-modal-inner {
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 1.5rem;
+      min-width: 280px;
+      max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    #fc-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    #fc-modal-title { font-weight: 700; color: #e65c00; font-size: 1em; }
+    #fc-modal-close {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    #fc-modal-close:hover { color: white; }
+    #fc-modal-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+    #fc-modal-list li {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border-left: 3px solid #e65c00;
+      font-size: 0.95em;
+    }
+    #fc-modal-list li span { font-size: 0.8em; opacity: 0.7; display: block; margin-top: 2px; }
+
+    @media (max-width: 767px) {
+      body { padding: 0.5rem; }
+      .fc { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#e65c00;"></div>
+      <span>Calendário Comum</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1a73e8;"></div>
+      <span>Calendário Formativo</span>
+    </div>
+  </div>
+
+  <div id="filter-bar">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="Calendário Comum">Comum</button>
+    <button class="filter-btn" data-filter="Calendário Formativo">Formativo</button>
+  </div>
+
+  <div id="calendar"></div>
+
+  <div id="fc-modal">
+    <div id="fc-modal-inner">
+      <div id="fc-modal-header">
+        <span id="fc-modal-title"></span>
+        <button id="fc-modal-close">✕</button>
+      </div>
+      <ul id="fc-modal-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
+    var CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTczWdbt5X4iRvY_KHzJmZZNmyQEB8TUopUrXM5UXy9Lyrx8oB92avuzqakPVHBqA_XnFMSF0suShv/pub?gid=2043344562&single=true&output=csv';
+    // ============================================================
+
+    var COLORS = {
+      'Calendário Comum':    '#e65c00',
+      'Calendário Formativo': '#1a73e8'
+    };
+
+    var allEvents   = [];
+    var activeFilter = 'all';
+    var calendar;
+
+    // ── CSV parser ──────────────────────────────────────────────
+    function parseCSVLine(line) {
+      var result = [], cur = '', inQ = false;
+      for (var i = 0; i < line.length; i++) {
+        var c = line[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+        else { cur += c; }
+      }
+      result.push(cur.trim());
+      return result;
+    }
+
+    function toISO(d) {
+      var p = d.split('/');
+      if (p.length === 3) return p[2] + '-' + p[1] + '-' + p[0];
+      return d;
+    }
+
+    // ── Load sheet ───────────────────────────────────────────────
+    function loadSheet() {
+      fetch(CSV_URL)
+        .then(function(r) { return r.text(); })
+        .then(function(text) {
+          var lines = text.split('\n').filter(function(l) { return l.trim() !== ''; });
+
+          allEvents = [];
+          for (var i = 1; i < lines.length; i++) {   // row 0 = header
+            var cols      = parseCSVLine(lines[i]);
+            var nome      = (cols[0] || '').trim();
+            var dataInicio = (cols[1] || '').trim();
+            var dataFim    = (cols[2] || '').trim();
+            var categoria  = (cols[3] || 'Calendário Comum').trim();
+
+            if (!nome || !dataInicio) continue;
+
+            var start = toISO(dataInicio);
+            var end   = dataFim ? toISO(dataFim) : null;
+
+            // FullCalendar end date is exclusive for multi-day events,
+            // so add 1 day when a DATA FIM exists
+            if (end) {
+              var d = new Date(end);
+              d.setDate(d.getDate() + 1);
+              end = d.toISOString().split('T')[0];
+            }
+
+            allEvents.push({
+              title: nome,
+              start: start,
+              end:   end,
+              backgroundColor: COLORS[categoria] || '#e65c00',
+              borderColor:     COLORS[categoria] || '#e65c00',
+              extendedProps: { categoria: categoria }
+            });
+          }
+
+          renderCalendar();
+        })
+        .catch(function(err) { console.error('Erro ao carregar planilha:', err); });
+    }
+
+    // ── Filter ───────────────────────────────────────────────────
+    function getFilteredEvents() {
+      if (activeFilter === 'all') return allEvents;
+      return allEvents.filter(function(e) {
+        return e.extendedProps.categoria === activeFilter;
+      });
+    }
+
+    // ── Modal ────────────────────────────────────────────────────
+    function openDayModal(date) {
+      var dateObj = new Date(date);
+      dateObj.setHours(0, 0, 0, 0);
+
+      var dayEvents = getFilteredEvents().filter(function(e) {
+        var s = new Date(e.start); s.setHours(0,0,0,0);
+        var en = e.end ? new Date(e.end) : new Date(s);
+        en.setHours(0,0,0,0);
+        // end is exclusive in FullCalendar, so day must be >= start and < end
+        if (e.end) return dateObj >= s && dateObj < en;
+        return dateObj.getTime() === s.getTime();
+      });
+
+      if (dayEvents.length === 0) return;
+
+      document.getElementById('fc-modal-title').textContent =
+        dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+      var list = document.getElementById('fc-modal-list');
+      list.innerHTML = '';
+
+      dayEvents.forEach(function(ev) {
+        var li   = document.createElement('li');
+        var color = COLORS[ev.extendedProps.categoria] || '#e65c00';
+        li.style.background      = color + '22';
+        li.style.borderLeftColor = color;
+        li.textContent = ev.title;
+        var span = document.createElement('span');
+        span.textContent = ev.extendedProps.categoria;
+        li.appendChild(span);
+        list.appendChild(li);
+      });
+
+      document.getElementById('fc-modal').className = 'active';
+    }
+
+    // ── Render calendar ──────────────────────────────────────────
+    function renderCalendar() {
+      var isMobile  = window.innerWidth < 768;
+      var container = document.getElementById('calendar');
+
+      if (calendar) calendar.destroy();
+
+      calendar = new FullCalendar.Calendar(container, {
+        initialView:    isMobile ? 'listMonth' : 'dayGridMonth',
+        locale:         'pt-br',
+        height:         'auto',
+        displayEventTime: false,
+        buttonText:     { today: 'Hoje', month: 'Mês', list: 'Lista' },
+        headerToolbar:  { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth' },
+        events:         getFilteredEvents(),
+        dateClick:  function(info) { openDayModal(info.date); },
+        eventClick: function(info) {
+          info.jsEvent.preventDefault();
+          openDayModal(info.event.start);
+        }
+      });
+
+      calendar.render();
+    }
+
+    // ── Filter buttons ───────────────────────────────────────────
+    var filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(function(b) { b.className = 'filter-btn'; });
+        this.className  = 'filter-btn active';
+        activeFilter    = this.getAttribute('data-filter');
+        renderCalendar();
+      });
+    });
+
+    // ── Modal close ──────────────────────────────────────────────
+    document.getElementById('fc-modal-close').onclick = function() {
+      document.getElementById('fc-modal').className = '';
+    };
+    document.getElementById('fc-modal').onclick = function(e) {
+      if (e.target === this) this.className = '';
+    };
+
+    // ── Boot ─────────────────────────────────────────────────────
+    loadSheet();
+  </script>
+</body>
+</html>
