@@ -488,14 +488,25 @@
        FOOTER
     ───────────────────────────────────────── */
     #site-footer {
-      text-align:     center;
-      padding:        1.25rem;
-      background:     var(--bg-surface);
-      border-top:     1px solid var(--border-color);
-      color:          var(--text-faint);
-      font-size:      0.82rem;
-      letter-spacing: 0.02em;
-      margin-top:     1rem;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      position:        relative;
+      padding:         1.25rem;
+      background:      var(--bg-surface);
+      border-top:      1px solid var(--border-color);
+      color:           var(--text-faint);
+      font-size:       0.82rem;
+      letter-spacing:  0.02em;
+      margin-top:      1rem;
+    }
+
+    #app-version {
+      position:  absolute;
+      right:     1.25rem;
+      color:     var(--text-faint);
+      font-size: 0.78rem;
+      opacity:   0.6;
     }
 
     /* ─────────────────────────────────────────
@@ -557,6 +568,17 @@
       }
       #theme-toggle-mobile:hover  { transform: scale(1.1); }
       #theme-toggle-mobile:active { transform: scale(0.95); }
+      #site-footer {
+        padding-bottom: 3rem;
+        flex-direction: column;
+        gap:            0.25rem;
+        text-align:     center;
+      }
+
+      #app-version {
+        position:  static;  /* remove o absolute */
+        font-size: 0.72rem;
+      }
     }
   </style>
 </head>
@@ -622,6 +644,7 @@
 <!-- ── Footer ───────────────────────────── -->
 <footer id="site-footer">
   <p>&copy; <span id="footer-year"></span> Comunidade Católica Eucaristós. Todos os direitos reservados.</p>
+  <span id="app-version">v1.0.0</span>
 </footer>
 
 <button id="theme-toggle-mobile" aria-label="Alternar tema">
@@ -781,14 +804,18 @@
      CALENDAR
   ───────────────────────────────────────── */
   function renderCalendar() {
-    const isMobile = window.innerWidth < 768;
+    const isMobile    = window.innerWidth < 768;
+    // ← Salva a view atual antes de destruir
+    const currentView = calendar ? calendar.view.type : 'dayGridMonth';
+    const currentDate = calendar ? calendar.getDate() : new Date();
+
     if (calendar) calendar.destroy();
 
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
       locale:      'pt-br',
-      initialView: 'dayGridMonth',
+      initialView: currentView,   // ← restaura a view
+      initialDate: currentDate,   // ← restaura a data
       height:      'auto',
-
       headerToolbar: isMobile ? {
         left:   '',
         center: 'title prev,next',
@@ -845,7 +872,13 @@
      RESPONSIVE RESIZE
   ───────────────────────────────────────── */
   let resizeTimer;
+  let lastWidth = window.innerWidth;
+
   window.addEventListener('resize', () => {
+    const newWidth = window.innerWidth;
+    if (newWidth === lastWidth) return; // ignora mudança só de altura
+    lastWidth = newWidth;
+
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(renderCalendar, 300);
   });
