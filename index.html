@@ -314,7 +314,7 @@
       border-radius: var(--radius-sm) !important;
       font-size:     0.92rem !important;
       font-weight:   600 !important;
-      padding:       3px 8px !important;
+      padding:       5px 8px !important;
       cursor:        pointer;
       opacity:       0.92;
       transition:    opacity 0.15s, transform 0.15s;
@@ -546,6 +546,14 @@
         justify-content: center;
         width:           100%;
       }
+      .fc .fc-daygrid-event-harness {
+        margin-bottom: 3px !important;
+      }
+
+      /* Mais padding dentro de cada evento */
+      .fc-event {
+        padding: 5px 8px !important;
+      }
       /* Show FAB, hide header button */
       #header-right       { display: none; }
       #theme-toggle-mobile {
@@ -644,7 +652,7 @@
 <!-- ── Footer ───────────────────────────── -->
 <footer id="site-footer">
   <p>&copy; <span id="footer-year"></span> Comunidade Católica Eucaristós. Todos os direitos reservados.</p>
-  <span id="app-version">v1.0.0</span>
+  <span id="app-version">v1.0.1</span>
 </footer>
 
 <button id="theme-toggle-mobile" aria-label="Alternar tema">
@@ -843,11 +851,25 @@
 
       // Date click — list all events that day
       dateClick: ({ dateStr }) => {
-        // Ignora se foi scroll
-        const diff = Math.abs((window.lastTouchMoveY ?? touchStartY) - touchStartY);
-        if (diff > 10) return;
+        if (didScroll) return; // foi scroll, ignora
+        const dayEvents = allEvents.filter(e => {
+          return dateStr >= e.start && dateStr < (e.end || e.start);
+        }).filter(e => activeFilter === 'todos' || e.extendedProps.categoria === activeFilter);
 
-        // ... resto do código igual
+        const date  = new Date(dateStr + 'T00:00:00');
+        const label = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+        const title = label.charAt(0).toUpperCase() + label.slice(1);
+
+        const body = dayEvents.length > 0
+                ? `<ul class="modal-event-list">${dayEvents.map(e => `
+                <li>
+                  <span class="dot" style="background:${COLORS[e.extendedProps.categoria] || '#555'}"></span>
+                  ${e.title}
+                </li>`).join('')}
+              </ul>`
+                : '<p class="no-events">Nenhum evento neste dia.</p>';
+
+        openModal(`<h2>${title}</h2>${body}`);
       },
     });
 
@@ -883,14 +905,16 @@
     resizeTimer = setTimeout(renderCalendar, 300);
   });
   // ── Scroll vs Tap detection ────────────────
-  let touchStartY = 0;
+  let touchStartY  = 0;
+  let didScroll    = false;
 
   document.addEventListener('touchstart', (e) => {
     touchStartY = e.touches[0].clientY;
+    didScroll   = false;
   }, { passive: true });
 
-  document.addEventListener('touchmove', (e) => {
-    window.lastTouchMoveY = e.touches[0].clientY;
+  document.addEventListener('touchmove', () => {
+    didScroll = true;
   }, { passive: true });
 
   document.addEventListener('touchend', () => {
