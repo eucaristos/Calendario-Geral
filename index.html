@@ -816,25 +816,12 @@
 
       // Date click — list all events that day
       dateClick: ({ dateStr }) => {
-        const dayEvents = allEvents.filter(e => {
-          return dateStr >= e.start && dateStr < (e.end || e.start);
-        }).filter(e => activeFilter === 'todos' || e.extendedProps.categoria === activeFilter);
+        // Ignora se foi scroll
+        const diff = Math.abs((window.lastTouchMoveY ?? touchStartY) - touchStartY);
+        if (diff > 10) return;
 
-        const date  = new Date(dateStr + 'T00:00:00');
-        const label = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-        const title = label.charAt(0).toUpperCase() + label.slice(1);
-
-        const body = dayEvents.length > 0
-                ? `<ul class="modal-event-list">${dayEvents.map(e => `
-                <li>
-                  <span class="dot" style="background:${COLORS[e.extendedProps.categoria] || '#555'}"></span>
-                  ${e.title}
-                </li>`).join('')}
-              </ul>`
-                : '<p class="no-events">Nenhum evento neste dia.</p>';
-
-        openModal(`<h2>${title}</h2>${body}`);
-      }
+        // ... resto do código igual
+      },
     });
 
     calendar.render();
@@ -862,6 +849,20 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(renderCalendar, 300);
   });
+  // ── Scroll vs Tap detection ────────────────
+  let touchStartY = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    window.lastTouchMoveY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    window.lastTouchMoveY = null;
+  }, { passive: true });
 
   /* ─────────────────────────────────────────
      INIT — FETCH CSV
