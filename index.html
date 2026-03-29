@@ -8,6 +8,9 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.ico" />
 
+  <!-- Umami Analytics -->
+  <script defer src="https://analytics.eucaristos.com.br/script.js" data-website-id="aa444510-5d2a-4827-bbf5-2919d564df55"></script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,36 +25,23 @@
        DESIGN TOKENS
     ───────────────────────────────────────── */
     :root {
-      /* Accent — UI chrome (buttons, hover, today) */
       --color-accent:     #6366f1;
-
-      /* Event category colors */
       --color-comum:      #0891b2;
       --color-formativo:  #16a34a;
-
-      /* Backgrounds */
       --bg-base:          #1a2332;
       --bg-surface:       #111827;
       --bg-card:          #1e2a3a;
       --bg-hover:         #2d3748;
       --today-bg:         rgba(45, 55, 72, 0.6);
-
-      /* Borders */
       --border-color:     #2d3748;
       --border-subtle:    #374151;
-
-      /* Text */
       --text-primary:     #f1f5f9;
       --text-secondary:   #e2e8f0;
       --text-muted:       #94a3b8;
       --text-faint:       #64748b;
-
-      /* Typography */
       --font-main:        'Inter', 'Segoe UI', sans-serif;
       --font-heading:     'Cinzel', serif;
       --font-sub:         'Lora', serif;
-
-      /* Shape */
       --radius-sm:        6px;
       --radius-md:        8px;
       --radius-lg:        14px;
@@ -59,7 +49,6 @@
       --radius-circle:    50%;
     }
 
-    /* Light mode overrides */
     body.light {
       --color-accent:     #4f46e5;
       --bg-base:          #f1f5f9;
@@ -72,7 +61,7 @@
       --text-secondary:   #1e293b;
       --text-muted:       #475569;
       --text-faint:       #94a3b8;
-      --today-bg: rgba(0, 0, 0, 0.08);
+      --today-bg:         rgba(0, 0, 0, 0.08);
     }
 
     /* ─────────────────────────────────────────
@@ -176,7 +165,6 @@
 
     #theme-toggle-mobile { display: none; }
 
-    /* Theme toggle button */
     #theme-toggle {
       display:      flex;
       align-items:  center;
@@ -242,15 +230,8 @@
       transition:    all 0.2s;
     }
     .filter-btn:hover  { border-color: var(--color-accent); color: var(--color-accent); }
-    .filter-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
-    /* Filter buttons */
-    .filter-btn.active {
-      background: var(--color-accent);
-      border-color: var(--color-accent);
-      color: #ffffff !important;
-    }
+    .filter-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: #ffffff !important; }
 
-    /* FullCalendar active/hover buttons */
     .fc .fc-button:not(:disabled):active,
     .fc .fc-button-primary:not(:disabled).fc-button-active {
       color: #ffffff !important;
@@ -321,7 +302,6 @@
     }
     .fc-event:hover { opacity: 1; transform: translateY(-1px); }
 
-    /* List view */
     .fc .fc-list-event-time                    { display: none; }
     .fc .fc-list-event-dot                     { display: none; }
     .fc .fc-list-day-cushion                   { background: var(--bg-surface); }
@@ -513,7 +493,6 @@
        RESPONSIVE — MOBILE
     ───────────────────────────────────────── */
     @media (max-width: 768px) {
-      /* Header */
       #site-header {
         grid-template-columns: auto 1fr;
         padding: 1rem;
@@ -524,17 +503,14 @@
       #header-center h1 { font-size: 1.2rem; white-space: normal; }
       #sub-header       { font-size: 0.78rem; }
 
-      /* Toolbar */
       #toolbar  { justify-content: center; }
       .legend   { display: none; }
 
-      /* Calendar */
       #calendar-wrapper { padding: 0.75rem; }
       .fc .fc-daygrid-day { min-height: 80px; }
-      .fc .fc-toolbar-title { font-size: 1.3rem; display: flex;align-items: anchor-center }
+      .fc .fc-toolbar-title { font-size: 1.3rem; }
       .fc .fc-button { padding: 0.5rem 1.1rem; font-size: 0.9rem; }
 
-      /* Stack toolbar chunks vertically */
       .fc .fc-header-toolbar {
         display:         flex;
         flex-direction:  column;
@@ -546,16 +522,9 @@
         justify-content: center;
         width:           100%;
       }
-      .fc .fc-daygrid-event-harness {
-        margin-bottom: 3px !important;
-      }
+      .fc .fc-daygrid-event-harness { margin-bottom: 3px !important; }
+      .fc-event { padding: 5px 8px !important; }
 
-      /* Mais padding dentro de cada evento */
-      .fc-event {
-        padding: 5px 8px !important;
-      }
-      /* Show FAB, hide header button */
-      #header-right       { display: none; }
       #theme-toggle-mobile {
         display:         flex;
         align-items:     center;
@@ -576,15 +545,15 @@
       }
       #theme-toggle-mobile:hover  { transform: scale(1.1); }
       #theme-toggle-mobile:active { transform: scale(0.95); }
+
       #site-footer {
-        padding-bottom: 3rem;
+        padding-bottom: 5rem;
         flex-direction: column;
         gap:            0.25rem;
         text-align:     center;
       }
-
       #app-version {
-        position:  static;  /* remove o absolute */
+        position:  static;
         font-size: 0.72rem;
       }
     }
@@ -655,9 +624,11 @@
   <span id="app-version">v1.0.3</span>
 </footer>
 
+<!-- ── Mobile Theme FAB ─────────────────── -->
 <button id="theme-toggle-mobile" aria-label="Alternar tema">
   <span class="toggle-icon">🌙</span>
 </button>
+
 <script>
   /* ─────────────────────────────────────────
      CONFIG
@@ -668,6 +639,14 @@
     'Calendário Geral':     '#0891b2',
     'Calendário Formativo': '#16a34a'
   };
+
+  /* ─────────────────────────────────────────
+     ANALYTICS HELPER
+  ───────────────────────────────────────── */
+  function track(event, props = {}) {
+    if (typeof umami === 'undefined' || typeof umami.track !== 'function') return;
+    umami.track(event, props);
+  }
 
   /* ─────────────────────────────────────────
      STATE
@@ -697,11 +676,11 @@
   /* ─────────────────────────────────────────
      THEME TOGGLE
   ───────────────────────────────────────── */
-  const themeToggle = document.getElementById('theme-toggle');
-  const toggleIcon  = themeToggle.querySelector('.toggle-icon');
-  const toggleLabel = themeToggle.querySelector('.toggle-label');
+  const themeToggle       = document.getElementById('theme-toggle');
+  const toggleIcon        = themeToggle.querySelector('.toggle-icon');
+  const toggleLabel       = themeToggle.querySelector('.toggle-label');
   const themeToggleMobile = document.getElementById('theme-toggle-mobile');
-  const mobileIcon = themeToggleMobile.querySelector('.toggle-icon');
+  const mobileIcon        = themeToggleMobile.querySelector('.toggle-icon');
 
   function applyTheme(theme) {
     const isLight = theme === 'light';
@@ -709,7 +688,7 @@
     const icon = isLight ? '☀️' : '🌙';
     toggleIcon.textContent  = icon;
     toggleLabel.textContent = isLight ? 'Modo Claro' : 'Modo Escuro';
-    mobileIcon.textContent  = icon;  // ← sync mobile FAB
+    mobileIcon.textContent  = icon;
     localStorage.setItem('theme', theme);
   }
 
@@ -717,6 +696,7 @@
 
   themeToggle.addEventListener('click', () => {
     applyTheme(document.body.classList.contains('light') ? 'dark' : 'light');
+    track('tema-alterado', { tema: document.body.classList.contains('light') ? 'dark' : 'light' });
   });
 
   themeToggleMobile.addEventListener('click', () => {
@@ -745,14 +725,14 @@
   /* ─────────────────────────────────────────
      CSV PARSING
   ───────────────────────────────────────── */
-  const pad     = (n) => String(n).padStart(2, '0');
+  const pad = (n) => String(n).padStart(2, '0');
 
   function parseDate(str) {
     if (!str) return null;
     const parts = str.split('/');
     return parts.length === 3
-            ? `${parts[2]}-${pad(parts[1])}-${pad(parts[0])}`
-            : str;
+      ? `${parts[2]}-${pad(parts[1])}-${pad(parts[0])}`
+      : str;
   }
 
   function addDay(dateStr) {
@@ -774,8 +754,8 @@
       const inicio = parseDate(cols[1].trim());
       if (!inicio) return acc;
 
-      const fim      = cols[2] ? parseDate(cols[2].trim()) : null;
-      const endDate  = fim ? addDay(fim) : addDay(inicio);
+      const fim     = cols[2] ? parseDate(cols[2].trim()) : null;
+      const endDate = fim ? addDay(fim) : addDay(inicio);
 
       acc.push({
         title:  cols[0].trim(),
@@ -813,7 +793,6 @@
   ───────────────────────────────────────── */
   function renderCalendar() {
     const isMobile    = window.innerWidth < 768;
-    // ← Salva a view atual antes de destruir
     const currentView = calendar ? calendar.view.type : 'dayGridMonth';
     const currentDate = calendar ? calendar.getDate() : new Date();
 
@@ -821,10 +800,11 @@
 
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
       locale:      'pt-br',
-      initialView: currentView,   // ← restaura a view
-      initialDate: currentDate,   // ← restaura a data
-      firstDay: 0,
+      initialView: currentView,
+      initialDate: currentDate,
+      firstDay:    0,
       height:      'auto',
+
       headerToolbar: isMobile ? {
         left:   '',
         center: 'title prev,next',
@@ -839,20 +819,26 @@
       buttonText: { today: 'Hoje', month: 'Mês', list: 'Lista' },
       events: getFilteredEvents(),
 
-      // Single event click
-      eventClick: ({ event }) => {
-        const { categoria, setor, obs } = event.extendedProps;
-        const color = COLORS[categoria] || '#555';
-        openModal(`
-            <div class="modal-event-name">${event.title}</div>
-            ${categoria ? `<span class="modal-badge" style="background:${color}">${categoria}</span>` : ''}
-
-          `);
+      // Rastreia troca de view
+      viewDidMount: ({ view }) => {
+        track('view-alterada', { view: view.type });
       },
 
-      // Date click — list all events that day
+      // Clique em evento
+      eventClick: ({ event }) => {
+        const { categoria } = event.extendedProps;
+        const color = COLORS[categoria] || '#555';
+        track('evento-visualizado', { nome: event.title, categoria });
+        openModal(`
+          <div class="modal-event-name">${event.title}</div>
+          ${categoria ? `<span class="modal-badge" style="background:${color}">${categoria}</span>` : ''}
+        `);
+      },
+
+      // Clique em data
       dateClick: ({ dateStr }) => {
-        if (didScroll) return; // foi scroll, ignora
+        if (didScroll) return;
+
         const dayEvents = allEvents.filter(e => {
           return dateStr >= e.start && dateStr < (e.end || e.start);
         }).filter(e => activeFilter === 'todos' || e.extendedProps.categoria === activeFilter);
@@ -862,13 +848,13 @@
         const title = label.charAt(0).toUpperCase() + label.slice(1);
 
         const body = dayEvents.length > 0
-                ? `<ul class="modal-event-list">${dayEvents.map(e => `
-                <li>
-                  <span class="dot" style="background:${COLORS[e.extendedProps.categoria] || '#555'}"></span>
-                  ${e.title}
-                </li>`).join('')}
-              </ul>`
-                : '<p class="no-events">Nenhum evento neste dia.</p>';
+          ? `<ul class="modal-event-list">${dayEvents.map(e => `
+              <li>
+                <span class="dot" style="background:${COLORS[e.extendedProps.categoria] || '#555'}"></span>
+                ${e.title}
+              </li>`).join('')}
+            </ul>`
+          : '<p class="no-events">Nenhum evento neste dia.</p>';
 
         openModal(`<h2>${title}</h2>${body}`);
       },
@@ -886,6 +872,7 @@
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeFilter = btn.dataset.filter;
+      track('filtro-aplicado', { categoria: activeFilter });
       calendar.removeAllEvents();
       calendar.addEventSource(getFilteredEvents());
     });
@@ -899,15 +886,17 @@
 
   window.addEventListener('resize', () => {
     const newWidth = window.innerWidth;
-    if (newWidth === lastWidth) return; // ignora mudança só de altura
+    if (newWidth === lastWidth) return;
     lastWidth = newWidth;
-
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(renderCalendar, 300);
   });
-  // ── Scroll vs Tap detection ────────────────
-  let touchStartY  = 0;
-  let didScroll    = false;
+
+  /* ─────────────────────────────────────────
+     SCROLL VS TAP DETECTION
+  ───────────────────────────────────────── */
+  let touchStartY = 0;
+  let didScroll   = false;
 
   document.addEventListener('touchstart', (e) => {
     touchStartY = e.touches[0].clientY;
@@ -918,27 +907,22 @@
     didScroll = true;
   }, { passive: true });
 
-  document.addEventListener('touchend', () => {
-    window.lastTouchMoveY = null;
-  }, { passive: true });
-
   /* ─────────────────────────────────────────
      INIT — FETCH CSV
   ───────────────────────────────────────── */
   fetch(CSV_URL)
-          .then(r => {
-            if (!r.ok) throw new Error(`Erro HTTP ${r.status}`);
-            return r.text();
-          })
-          .then(text => {
-            allEvents = parseCSV(text);
-            if (allEvents.length > 0) renderCalendar();
-          })
-          .catch(err => {
-            showError(`Não foi possível carregar os eventos. Verifique sua conexão ou as permissões da planilha. (${err.message})`);
-          });
+    .then(r => {
+      if (!r.ok) throw new Error(`Erro HTTP ${r.status}`);
+      return r.text();
+    })
+    .then(text => {
+      allEvents = parseCSV(text);
+      if (allEvents.length > 0) renderCalendar();
+    })
+    .catch(err => {
+      showError(`Não foi possível carregar os eventos. Verifique sua conexão ou as permissões da planilha. (${err.message})`);
+    });
 </script>
-<!-- Floating theme toggle — mobile only -->
 
 </body>
 </html>
